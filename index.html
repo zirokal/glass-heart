@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>glass heart overlay</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h1>💔 glass heart icon generator 💔</h1>
+  <p>upload your profile picture to add the overlay! join willings to show support for ichillin' :D</p>
+
+  <input type="file" id="upload" accept="image/*" />
+  <br />
+  <canvas id="canvas" width="320" height="320"></canvas>
+  <br />
+  <button id="downloadBtn">download image</button>
+
+  <p class="credits">overlay + color by <a href="https://twitter.com/jjunlver" target="_blank">@jjunlver</a> & <a href="https://twitter.com/kpop4002" target="_blank">@kpop4002</a></p>
+
+  <script>
+  const upload = document.getElementById("upload");
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  const pinkOverlay = new Image();
+  pinkOverlay.src = "pink.jpg";
+
+  const crackOverlay = new Image();
+  crackOverlay.src = "overlay.png";
+
+  upload.addEventListener("change", (e) => {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const img = new Image();
+      img.onload = function() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Step 1: draw original image
+        ctx.globalAlpha = 1.0;
+        ctx.globalCompositeOperation = "source-over";
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Step 2: draw pink overlay with screen blend & 0.2 opacity
+        pinkOverlay.onload = () => {
+          ctx.globalAlpha = 0.75;
+          ctx.globalCompositeOperation = "screen";
+          ctx.drawImage(pinkOverlay, 0, 0, canvas.width, canvas.height);
+
+          // Step 3: draw crack overlay (normal blend, full opacity)
+          crackOverlay.onload = () => {
+            ctx.globalAlpha = 1.0;
+            ctx.globalCompositeOperation = "lighter";
+            ctx.drawImage(crackOverlay, 0, 0, canvas.width, canvas.height);
+          };
+
+          // if already loaded before upload
+          if (crackOverlay.complete) crackOverlay.onload();
+        };
+
+        // if already loaded before upload
+        if (pinkOverlay.complete) pinkOverlay.onload();
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  });
+
+  document.getElementById("downloadBtn").addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = "glassheart_pfp.png";
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+</script>
+</body>
+</html>
